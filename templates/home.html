@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% block title %}Salón del gremio{% endblock %}{% block crumb %}SALÓN DEL GREMIO{% endblock %}
+{% block body %}
+<section class="hall-banner"><div class="banner-shade"><span class="overline">CAPÍTULO I · LOS CONTRATOS DEL GREMIO</span><h1>Forjá tu leyenda.</h1><p>Reclutá héroes. Reuní cuadrillas. Cumplí contratos. Protegé el tesoro del gremio.</p><a class="btn primary" href="{{ url_for('misiones') }}">Abrir tablón de misiones <span>↗</span></a></div></section>
+<section class="stats-grid">
+  <div class="stat"><span>TESORO ACTUAL</span><strong class="gold">{{ '%.0f'|format(g.resumen.saldo_actual|float) }} ◆</strong><small>Oro disponible</small></div>
+  <div class="stat"><span>AVENTUREROS</span><strong>{{ g.heroes|length }}</strong><small>{{ g.heroes|selectattr('estado','equalto','disponible')|list|length }} disponibles</small></div>
+  <div class="stat"><span>MISIONES SUPERADAS</span><strong>{{ g.completed }} <em>/ {{ g.goal }}</em></strong><small>Objetivo de temporada</small></div>
+  <div class="stat"><span>CONTRATOS ABIERTOS</span><strong>{{ g.active+g.pending }}</strong><small>{{ g.active }} en progreso</small></div>
+</section>
+<div class="two-columns"><section class="panel"><div class="panel-title"><span class="spark">✦</span><h2>Próximos contratos</h2><a href="{{ url_for('misiones') }}">Ver todos →</a></div>
+{% for m in g.missions if m.estado in ('en_progreso','pendiente') %}{% if loop.index<=4 %}<a href="{{ url_for('misiones') }}" class="row-link"><span class="mission-badge">{% if m.estado=='en_progreso' %}⚔{% else %}✧{% endif %}</span><span class="row-main"><b>{{ m.titulo }}</b><small>Dificultad {{ m.nivel_dificultad }} · {{ m.estado|replace('_',' ') }}</small></span><span class="gold">{{ '%.0f'|format(m.recompensa_oro|float) }} ◆</span></a>{% endif %}{% else %}<p class="empty">No quedan contratos disponibles.</p>{% endfor %}</section>
+<section class="panel"><div class="panel-title"><span class="spark">✦</span><h2>Crónica del gremio</h2><a href="{{ url_for('tesoro') }}">Tesorería →</a></div>{% for h in g.history[:5] %}<div class="row-link readonly"><span class="ledger-symbol {% if h.tipo=='ingreso_mision' %}plus{% else %}minus{% endif %}">{% if h.tipo=='ingreso_mision' %}+{% else %}−{% endif %}</span><span class="row-main"><b>{{ h.concepto }}</b><small>{{ h.fecha[:10] }}</small></span><span class="{% if h.tipo=='ingreso_mision' %}green{% else %}red{% endif %}">{{ '%.0f'|format(h.monto|float) }} ◆</span></div>{% endfor %}</section></div>
+{% endblock %}

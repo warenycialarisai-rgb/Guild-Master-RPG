@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101820">
+  <title>{% block title %}Guild Master{% endblock %} · RPG</title>
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/game.css') }}">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="{{ url_for('inicio') }}"><span class="brand-mark">✦</span><span>GUILD<br><b>MASTER</b><small>RPG · GRUPO 6</small></span></a>
+    <nav class="nav" aria-label="Navegación principal">
+      <a class="{% if section=='inicio' %}active{% endif %}" href="{{ url_for('inicio') }}"><span>⌂</span> Salón del gremio</a>
+      <a class="{% if section=='heroes' %}active{% endif %}" href="{{ url_for('aventureros') }}"><span>♞</span> Aventureros</a>
+      <a class="{% if section=='missions' %}active{% endif %}" href="{{ url_for('misiones') }}"><span>⚔</span> Misiones</a>
+      <a class="{% if section=='armory' %}active{% endif %}" href="{{ url_for('armeria') }}"><span>◇</span> Armería</a>
+      <a class="{% if section=='treasury' %}active{% endif %}" href="{{ url_for('tesoro') }}"><span>◈</span> Tesoro</a>
+    </nav>
+    <div class="sidebar-bottom"><div class="insignia">EL GREMIO PERDURA</div><div class="tiny">Edición de demostración · SQLite</div>
+      {% if auth_enabled %}<form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="text-button">Cerrar sesión</button></form>{% endif %}
+    </div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><span class="breadcrumb">REINO DE LAS FRONTERAS / <strong>{% block crumb %}SALÓN{% endblock %}</strong></span><span class="gold-counter"><span class="coin">◆</span>{{ '%.0f'|format(g.resumen.saldo_actual|float) }} <small>ORO</small></span></header>
+    <main class="content">
+      {% with notices = get_flashed_messages(with_categories=true) %}{% for kind,note in notices %}<div class="notice {{ kind }}">{{ note }}</div>{% endfor %}{% endwith %}
+      {% if g.result %}<div class="ending {% if g.result=='victoria' %}won{% endif %}"><span class="ending-symbol">{% if g.result=='victoria' %}✦{% else %}✕{% endif %}</span><div><b>{% if g.result=='victoria' %}TEMPORADA GANADA{% else %}TEMPORADA TERMINADA{% endif %}</b><p>{% if g.result=='victoria' %}El gremio cumplió su objetivo de {{ g.goal }} misiones completas.{% else %}Ya no quedan misiones activas y no se alcanzó el objetivo. La partida terminó en derrota.{% endif %} Para una nueva partida, conservá una copia y reinicializá la base local desde el SQL.</p></div></div>{% endif %}
+      {% block body %}{% endblock %}
+    </main>
+    <footer class="footer">GUILD MASTER RPG · INFORMÁTICA II · GRUPO 6 <span>Sin servicios externos · Partida guardada en SQLite</span></footer>
+  </div>
+</div>
+</body>
+</html>

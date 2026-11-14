@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Bosque Oscuro{% endblock %}
+{% block crumb %}EXPEDICIÓN / BOSQUE OSCURO{% endblock %}
+{% block body %}
+<link rel="stylesheet" href="{{ url_for('static',filename='css/forest-override.css') }}">
+<div class="forest-heading">
+  <div>
+    <span class="overline">EXPEDICIÓN INTERACTIVA · DARK FOREST (PHASER 3)</span>
+    <h1>{{ mission.titulo }}</h1>
+    <p>Recorré el bosque, combatí cuando aparezcan enemigos y encontrá la salida. La derrota de la cuadrilla hace fracasar la misión.</p>
+  </div>
+  <a class="btn" href="{{ url_for('misiones') }}">← Volver al gremio</a>
+</div>
+<section class="forest-layout">
+  <div class="forest-main">
+    <div class="forest-top"><strong>BOSQUE OSCURO</strong><span>Dificultad {{ mission.nivel_dificultad }} · MISIÓN #{{ mission.id }}</span></div>
+    {% if installed %}
+      <div class="forest-stage">
+        <div class="forest-window" id="forest-window">
+          <button type="button" id="forest-fullscreen" class="forest-fullscreen" title="Ver el juego a pantalla completa">Pantalla completa</button>
+          <iframe id="dark-forest-frame" title="Dark Forest: exploración y batallas por turnos"
+            allow="fullscreen" referrerpolicy="same-origin" loading="eager" tabindex="0"></iframe>
+        </div>
+        <div id="forest-launch" class="forest-launch">
+          <div class="forest-launch-card">
+            <span class="overline">ANTES DE ENTRAR</span>
+            <h2>Exploración del Bosque Oscuro</h2>
+            <p>Vas a controlar un personaje por el mapa. Las criaturas serán visibles y los combates solo comenzarán si decidís enfrentarlas.</p>
+            <div class="forest-guide-grid">
+              <div><strong>1 · MOVERSE</strong><span>Flechas para caminar. Acercate a una criatura visible.</span></div>
+              <div><strong>2 · COMBATIR</strong><span>Pulsá E o hacé clic en una criatura cercana. Confirmá el combate, luego elegí Atacar y el objetivo.</span></div>
+              <div><strong>3 · TERMINAR</strong><span>Encontrá la salida para ganar; si la cuadrilla cae, perdés.</span></div>
+            </div>
+            <button type="button" class="btn primary forest-start" id="forest-launch-button">Entrar al bosque</button>
+          </div>
+        </div>
+      </div>
+      <p class="forest-tip" id="forest-tip">Primero leé las instrucciones y pulsá Entrar al bosque.</p>
+    {% else %}
+      <div class="forest-missing"><h2>Falta instalar el juego original</h2>
+        <p>Ejecutá <code>instalar_dark_forest.bat</code> una sola vez en la carpeta de Guild Master. Descargará el juego compilado para ejecutarlo sin conexión.</p>
+        <p>Después recargá esta página. No se modifican el SQL ni las partidas.</p>
+      </div>
+    {% endif %}
+  </div>
+  <aside class="forest-aside">
+    <section class="forest-aside-card">
+      <div class="overline">TU CUADRILLA · SQLITE</div>
+      {% for h in squad %}
+      <div class="forest-member"><span class="forest-avatar">{% if h.clase=='mago' %}✧{% elif h.clase=='arquero' %}➶{% else %}⚔{% endif %}</span>
+        <div><b>{{ h.nombre }}</b><small>{{ h.clase|capitalize }} · Nivel {{ h.nivel }} · Atq {{ h.ataque }} · Def {{ h.defensa }}</small></div>
+      </div>
+      {% endfor %}
+    </section>
+    <section class="forest-aside-card"><div class="overline">OBJETIVO</div>
+      <h2>Salvar la expedición</h2>
+      <p>Los niveles y el equipamiento de tus héroes influyen en el combate. Dark Forest utiliza tres combatientes: si elegiste menos, los otros serán ayudantes temporales. La misión se registra una sola vez al terminar.</p>
+      <div id="forest-status" role="status" aria-live="polite">El juego espera el inicio de la aventura.</div>
+      <p class="forest-credit">Adaptación educativa de <a href="https://github.com/macnick/RPG-game" target="_blank" rel="noopener noreferrer">Dark Forest · Nick Haras</a> (código MIT). Recursos de terceros: consultar créditos originales.</p>
+    </section>
+  </aside>
+</section>
+{% if installed %}
+<script>
+window.GUILD_DARK_FOREST={{ {'game_url':url_for('static',filename='darkforest/index.html'),
+'api_url':url_for('dark_forest.resultado', mission_id=mission.id), 'csrf':csrf,
+'run_token':token, 'mission_id':mission.id, 'squad':squad}|tojson }};
+</script>
+<script defer src="{{ url_for('static',filename='js/forest-parent.js') }}"></script>
+{% endif %}
+{% endblock %}

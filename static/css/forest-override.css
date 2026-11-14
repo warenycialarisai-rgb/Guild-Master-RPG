@@ -1,0 +1,51 @@
+/* Guild Master V3.2 — responsive: fill the space without cropping Phaser 800×600. */
+.forest-heading {max-width:none;margin-bottom:12px;align-items:center}
+.forest-heading h1 {font-size:clamp(24px,2.15vw,34px);margin:3px 0 5px}
+.forest-heading p {font-size:12px;max-width:1000px}
+.forest-layout {grid-template-columns:minmax(0,1fr) 275px;gap:12px;align-items:start}
+.forest-main {min-width:0;padding:7px;max-width:none}
+.forest-top {padding:6px 10px 9px}
+.forest-stage {position:relative;min-width:0}
+.forest-window {position:relative;display:block;width:100%;height:600px;min-height:0;overflow:hidden;
+  border:2px ridge #817251;background:#070c10}
+#dark-forest-frame {position:absolute;top:50%;left:50%;width:800px;height:600px;max-width:none;
+  min-width:800px;min-height:600px;border:0;display:block;
+  transform-origin:center center;transform:translate(-50%,-50%) scale(1)}
+.forest-aside {min-width:0;gap:10px}
+.forest-aside-card {padding:13px}
+.forest-aside-card h2 {font-size:17px}
+.forest-aside-card p {font-size:11px}
+.forest-tip {margin:7px 6px 2px;font-size:10px}
+.forest-fullscreen {position:absolute;z-index:5;right:11px;top:9px;cursor:pointer;
+  background:#1d302def;border:1px solid #c7a36c;border-radius:3px;
+  color:#f6e9cd;padding:7px 10px;font:bold 11px Verdana,Arial,sans-serif;
+  box-shadow:0 4px 10px #090d11ba}
+.forest-fullscreen:hover,.forest-fullscreen:focus-visible {background:#395a52;outline:2px solid #edc77a}
+.forest-launch {position:absolute;inset:0;z-index:4;display:flex;align-items:center;
+  justify-content:center;background:linear-gradient(135deg,#121b24,#283542);text-align:center;padding:14px}
+.forest-launch[hidden] {display:none!important}
+.forest-launch-card {max-width:530px;padding:20px;background:#18232d;border:2px solid #a88a5e;box-shadow:0 10px 25px #080b11bb}
+.forest-launch-card h2 {font-size:23px;color:#eac68c;margin:5px 0 11px}
+.forest-launch-card p {font-size:12px;line-height:1.6;color:#c8d0ca;margin:0 0 14px}
+.forest-guide-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0 16px}
+.forest-guide-grid>div {display:flex;flex-direction:column;gap:6px;background:#263541;border:1px solid #5c665d;padding:11px 8px;text-align:left}
+.forest-guide-grid strong {font-size:10px;color:#f0cf93}
+.forest-guide-grid span {font-size:10px;color:#d4dcd7;line-height:1.5}
+.forest-start {font-size:14px;padding:12px 23px}
+#forest-window:fullscreen {width:100vw!important;height:100vh!important;min-height:100vh!important;
+  border:0;background:#080d12}
+#forest-window:fullscreen .forest-fullscreen {right:20px;top:20px}
+@media(max-width:1450px) {
+  .forest-layout {grid-template-columns:minmax(0,1fr)}
+  .forest-aside {grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+}
+@media(max-width:690px) {
+  .forest-aside {grid-template-columns:minmax(0,1fr)}
+  .forest-heading {align-items:start}
+  .forest-guide-grid {grid-template-columns:1fr}
+  .forest-launch-card {padding:10px}
+  .forest-launch-card h2 {font-size:17px}
+  .forest-launch-card p {font-size:10px}
+  .forest-guide-grid>div {padding:5px 8px}
+  .forest-main {padding:4px}
+}
