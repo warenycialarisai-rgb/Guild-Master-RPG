@@ -19,17 +19,16 @@
       <a class="{% if section=='treasury' %}active{% endif %}" href="{{ url_for('tesoro') }}"><span>◈</span> Tesoro</a>
     </nav>
     <div class="sidebar-bottom"><div class="insignia">EL GREMIO PERDURA</div><div class="tiny">Edición de demostración · SQLite</div>
-      {% if auth_enabled %}<form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="text-button">Cerrar sesión</button></form>{% endif %}
     </div>
   </aside>
   <div class="workspace">
     <header class="topbar"><span class="breadcrumb">REINO DE LAS FRONTERAS / <strong>{% block crumb %}SALÓN{% endblock %}</strong></span><span class="gold-counter"><span class="coin">◆</span>{{ '%.0f'|format(g.resumen.saldo_actual|float) }} <small>ORO</small></span></header>
     <main class="content">
       {% with notices = get_flashed_messages(with_categories=true) %}{% for kind,note in notices %}<div class="notice {{ kind }}">{{ note }}</div>{% endfor %}{% endwith %}
-      {% if g.result %}<div class="ending {% if g.result=='victoria' %}won{% endif %}"><span class="ending-symbol">{% if g.result=='victoria' %}✦{% else %}✕{% endif %}</span><div><b>{% if g.result=='victoria' %}TEMPORADA GANADA{% else %}TEMPORADA TERMINADA{% endif %}</b><p>{% if g.result=='victoria' %}El gremio cumplió su objetivo de {{ g.goal }} misiones completas.{% else %}Ya no quedan misiones activas y no se alcanzó el objetivo. La partida terminó en derrota.{% endif %} Para una nueva partida, conservá una copia y reinicializá la base local desde el SQL.</p></div></div>{% endif %}
+      {% if g.result %}<div class="ending {% if g.result=='victoria' %}won{% endif %}"><span class="ending-symbol">{% if g.result=='victoria' %}✦{% else %}✕{% endif %}</span><div><b>{% if g.result=='victoria' %}TEMPORADA GANADA{% else %}TEMPORADA TERMINADA{% endif %}</b><p>{% if g.result=='victoria' %}El gremio cumplió su objetivo de {{ g.goal }} misiones completas.{% else %}Ya no quedan misiones activas y no se alcanzó el objetivo. La partida terminó en derrota.{% endif %} Tu partida se conserva en este navegador mientras mantengas sus cookies.</p></div></div>{% endif %}
       {% block body %}{% endblock %}
     </main>
-    <footer class="footer">GUILD MASTER RPG · INFORMÁTICA II · GRUPO 6 <span>Sin servicios externos · Partida guardada en SQLite</span></footer>
+    <footer class="footer">GUILD MASTER RPG · INFORMÁTICA II · GRUPO 6 <span>Partida individual · Guardada en SQLite</span></footer>
   </div>
 </div>
 </body>

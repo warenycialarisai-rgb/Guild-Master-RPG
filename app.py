@@ -5,9 +5,11 @@ import os
 import secrets
 import sqlite3
 import tempfile
+import re
+from datetime import timedelta
 from pathlib import Path
 from flask import Flask, abort, flash, jsonify, redirect, render_template, request, send_file, session, url_for
-from database import initialize, connect
+from database import initialize, connect, shared_db_path
 from game import GameError, assign, buy, payroll, recover, recruit, resolve, state, toggle_equip
 from forest_bridge import forest_bp
 
@@ -18,61 +20,42 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = bool(os.environ.get('RAILWAY_ENVIRONMENT'))
 app.config['MAX_CONTENT_LENGTH'] = 16_384
+app.permanent_session_lifetime = timedelta(days=365)
 
-# En producción se exige contraseña; localmente no es necesaria.
-ADMIN_PASSWORD = os.getenv('APP_PASSWORD','')
-if os.getenv('RAILWAY_ENVIRONMENT') and not ADMIN_PASSWORD:
-    raise RuntimeError('Configurar APP_PASSWORD en Railway antes de publicar.')
-
-# Inicializar una sola vez antes de atender peticiones concurrentes.
-initialize()
+# Sin contraseña: cada navegador recibe un identificador aleatorio firmado
+# en la cookie de sesión de Flask. La base de cada partida permanece en /data/players.
+# La base compartida de la versión anterior se conserva sin exponerla a visitantes.
+initialize(shared_db_path())
 app.register_blueprint(forest_bp)
 
 @app.before_request
 def guard():
     if request.path == '/health' or request.path.startswith('/static/'):
         return
-    if request.endpoint == 'login':
-        return
-    if ADMIN_PASSWORD and not session.get('authenticated'):
-        return redirect(url_for('login'))
+    player_id = session.get('guild_player_id')
+    if not isinstance(player_id, str) or not re.fullmatch(r'[0-9a-f]{32}', player_id):
+        session.clear()
+        session['guild_player_id'] = secrets.token_hex(16)
+    session.permanent = True
     if 'csrf' not in session:
         session['csrf'] = secrets.token_urlsafe(30)
     if request.method == 'POST':
-        if not secrets.compare_digest(request.form.get('csrf') or request.headers.get('X-CSRF-Token', ''), session['csrf']):
+        token = request.form.get('csrf') or request.headers.get('X-CSRF-Token', '')
+        if not secrets.compare_digest(token, session['csrf']):
             abort(400, 'Formulario inválido. Actualizá la página y volvé a intentar.')
 
 @app.get('/health')
 def health():
     try:
-        with connect() as db:
+        with connect(path=shared_db_path()) as db:
             db.execute('SELECT COUNT(*) FROM Aventurero').fetchone()
         return {'status':'ok'}, 200
     except (sqlite3.Error, RuntimeError):
         return {'status':'error'}, 503
 
-@app.route('/login',methods=['GET','POST'])
-def login():
-    if request.method=='POST':
-        submitted=request.form.get('password','')
-        if ADMIN_PASSWORD and secrets.compare_digest(submitted,ADMIN_PASSWORD):
-            session.clear()
-            session['authenticated']=True
-            session['csrf']=secrets.token_urlsafe(30)
-            return redirect(url_for('inicio'))
-        flash('Contraseña incorrecta.', 'error')
-    if not ADMIN_PASSWORD:
-        return redirect(url_for('inicio'))
-    return render_template('login.html')
-
-@app.post('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
-
 @app.context_processor
 def globals_for_templates():
-    return {'csrf':session.get('csrf',''), 'auth_enabled':bool(ADMIN_PASSWORD)}
+    return {'csrf': session.get('csrf', ''), 'auth_enabled': False}
 
 @app.get('/')
 def inicio():

@@ -1,16 +1,31 @@
 """Base de datos del gremio: no altera el esquema SQL entregado por el equipo."""
 from __future__ import annotations
 import os
+import re
 import sqlite3
+import threading
 from contextlib import contextmanager
 from pathlib import Path
+from flask import has_request_context, session
 
 ROOT = Path(__file__).resolve().parent
 SQL_PATH = ROOT / 'gremioDDLg6.sql'
+_INITIALIZE_LOCK = threading.Lock()
+
+
+def shared_db_path() -> Path:
+    """Partida heredada de V3.3: se preserva, no se asigna a visitantes."""
+    return Path(os.environ.get('DB_PATH') or ROOT / 'data' / 'gremio.db').expanduser().resolve()
 
 
 def db_path() -> Path:
-    return Path(os.environ.get('DB_PATH') or ROOT / 'data' / 'gremio.db').expanduser().resolve()
+    base = shared_db_path()
+    if not has_request_context():
+        return base
+    player_id = session.get('guild_player_id')
+    if not isinstance(player_id, str) or not re.fullmatch(r'[0-9a-f]{32}', player_id):
+        raise RuntimeError('No se pudo identificar esta partida.')
+    return base.parent / 'players' / (player_id + '.db')
 
 
 def _new_connection(path: Path) -> sqlite3.Connection:
@@ -22,7 +37,13 @@ def _new_connection(path: Path) -> sqlite3.Connection:
 
 
 def initialize(path: Path | None = None) -> Path:
-    """Inicialización única desde el SQL oficial. Nunca resetea una partida existente."""
+    """Inicialización única, protegida frente a dos peticiones del mismo visitante."""
+    with _INITIALIZE_LOCK:
+        return _initialize_locked(path)
+
+
+def _initialize_locked(path: Path | None = None) -> Path:
+    """No reinicializar ni sobrescribir una partida existente."""
     path = Path(path or db_path()).resolve()
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists():
