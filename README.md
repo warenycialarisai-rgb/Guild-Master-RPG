@@ -15,7 +15,7 @@ El objetivo es llegar a **5 misiones completadas** para ganar la temporada. Si s
 - **Python y Flask:** para la aplicación y las distintas pantallas (elejimos flask por su facilidad para manejar elementos web con python y la coneccion con sqlite).
 - **SQLite:** para guardar los aventureros, las misiones, el inventario y los movimientos del tesoro.
 - **HTML, CSS y JavaScript:** para la interfaz.
-- **Phaser / Dark Forest:** para la parte de combate. (juego opensource bajo licencia MIT adaptado a nuestra propuesta) 
+- **Phaser / Dark Forest:** para la parte de combate. (juego opensource bajo licencia MIT adaptado a nuestra propuesta, Sólo funciona como experiencia, en lógica sólo determina Victoria si o no. funciona como un interrupotor interactivo, no modifica ni altera directamente la base de datos.) 
 - **GitHub:** para guardar y compartir el código.
 - **Railway:** para tener el juego publicado en internet.
 
