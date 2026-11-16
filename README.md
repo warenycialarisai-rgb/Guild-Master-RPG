@@ -22,6 +22,9 @@ El objetivo es llegar a **5 misiones completadas** para ganar la temporada. Si s
 
 ## Cómo instalarlo en otra computadora
 
+VERSIÓN PORTABLE EN RELEASES. 
+
+## para ejecución decompilado. 
 Para ejecutarlo localmente necesitamos tener instalado **Python 3.10 o superior** (usamos Python 3.11). También necesitamos conexión a internet para instalar las dependencias la primera vez.
 
 1. Descargar el proyecto desde GitHub:
